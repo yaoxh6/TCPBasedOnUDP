@@ -5,12 +5,15 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-public class receiveThread implements Runnable  {
+public class receiveThread extends Thread  {
 
     private DatagramSocket dsk = null;
     byte[] receiveBuf = new byte[1];
-    receiveThread(DatagramSocket dsk){
+    extendQueue clientQueue = null;
+
+    public receiveThread(DatagramSocket dsk,extendQueue clientQueue){
         this.dsk = dsk;
+        this.clientQueue = clientQueue;
     }
     int num = 0;
     @Override
@@ -23,8 +26,14 @@ public class receiveThread implements Runnable  {
                 if(dsk==null){
                     break;
                 }
-                    dsk.receive(dpk);
-                    System.out.println("yes" + num);
+                dsk.receive(dpk);
+                synchronized (clientQueue){
+                    if(!clientQueue.isEmpty()){
+                        clientQueue.popDatagramPacket();
+                        System.out.println("remove" + num);
+                    }
+                }
+                //System.out.println("yes" + num);
             }
             catch (Exception e){
                 e.printStackTrace();

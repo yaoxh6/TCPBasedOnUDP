@@ -6,15 +6,15 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 public class UDPClient {
-	
+
+    public static extendQueue clientQueue = new extendQueue();
 //	private static final String SEND_FILE_PATH = "2018.flv";
-	
 	public static void main(String[] args) {
 		System.out.println("LFTP client start...");
 		try{
 			DatagramSocket dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName("localhost"));
-			sendThread st1 = new sendThread(dsk);
-			receiveThread st2 = new receiveThread(dsk);
+			sendThread st1 = new sendThread(dsk,clientQueue);
+			receiveThread st2 = new receiveThread(dsk,clientQueue);
 			Thread t1 = new Thread(st1);
 			Thread t2 = new Thread(st2);
 			t1.start();
