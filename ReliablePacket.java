@@ -14,9 +14,9 @@ public class ReliablePacket {
 		this._seqnum = seqnum;
 		this._type = type;
 		this._packet = packet;
-		setCheckSum();
+		this._checksum = getCheckSum();
 	}
-	private void setCheckSum(){
+	private int getCheckSum(){
 		int length = _packet.getLength();
 		byte[] data = _packet.getData();
 		byte a,b;
@@ -39,6 +39,17 @@ public class ReliablePacket {
 			sum = ~sum;
 			sum = sum&0x0FFFF;
 		}
-		_checksum = sum;
+		return sum;
+	}
+	public boolean check(){
+		if(_packet==null){
+			System.out.println("The packet is null.");
+			return false;
+		}
+		if(_checksum+getCheckSum()==65535) return true;
+		else {
+			System.out.println("Packet "+Integer.toString(_seqnum)+" error.");
+			return false;
+		}
 	}
 }
