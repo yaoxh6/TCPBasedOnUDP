@@ -62,7 +62,7 @@ public class UDPServer {
 
 					dpk.setData(buf,0, buf.length);
 					System.out.println("Receive count of "+ ( ++readCount ) +" !");
-				    dsk.receive(dpk);
+					dsk.receive(dpk);
 				}
 				else{
 					byte[] a = new byte[1];

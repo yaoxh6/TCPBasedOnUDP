@@ -26,15 +26,12 @@ public class receiveThread extends Thread  {
                 if(dsk==null){
                     break;
                 }
-                dsk.receive(dpk);
-                synchronized (clientQueue){
-                    if(receiveBuf[0]!=-1){
-                        if(!clientQueue.isEmpty()){
-                            clientQueue.popDatagramPacket();
-                            System.out.println("remove" + num);
-                        }
+                synchronized (this){
+                    dsk.receive(dpk);
+                    if(receiveBuf[0]!=-1 && clientQueue.getClientQueue().peek().getData()[0] == receiveBuf[0]){
+                        clientQueue.popDatagramPacket();
+                        System.out.println("Confirm " + receiveBuf[0]);
                     }
-                    
                 }
                 //System.out.println("yes" + num);
             }

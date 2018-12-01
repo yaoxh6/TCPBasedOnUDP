@@ -28,10 +28,10 @@ public class sendThread extends Thread  {
             int sendCount = 0;
             while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
                 ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, buf);
-                dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
-
-                dsk.send(dpk);
+                dpk.setData(packet.getBuf(), 0, readSize+6);
+                System.out.println("packet checkSum : "+packet.getCheckSum());
                 synchronized (clientQueue){
+                    dsk.send(dpk);
                     clientQueue.addDatagramPacket(dpk);
                     System.out.println("clientQueueLength:"+clientQueue.getCurrentQueueSize());
                     System.out.println("Send count of " + (++sendCount) + "!");
