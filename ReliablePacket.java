@@ -14,14 +14,13 @@ public class ReliablePacket {
 	
 	
 	//client side
-	public ReliablePacket(byte seqnum, byte rwnd, Byte cwnd, DatagramPacket packet){
+	public ReliablePacket(byte seqnum, byte rwnd, Byte cwnd, byte[] data){
 		this._seqnum = seqnum;
 		this._rwnd = rwnd;
 		this._cwnd = cwnd;
 		this._acknum = seqnum;
-		this.buf = new byte[packet.getLength()+6];
-		byte[] data = packet.getData();
-		int length = packet.getLength();
+		this.buf = new byte[data.length+6];
+		int length = data.length;
 		for (int i = 0;i < length;i++){
 			buf[i] = data[i];
 		}
@@ -35,9 +34,9 @@ public class ReliablePacket {
 		
 	}
 	//server side
-	public ReliablePacket(DatagramPacket packet){
-		buf = packet.getData();
-		int length = packet.getLength();
+	public ReliablePacket(byte[] data){
+		buf = data;
+		int length = data.length;
 		this._checksum = (buf[length-2]<<8)+buf[length-1];
 		this._seqnum = buf[length-6];
 		this._acknum = buf[length-5];
