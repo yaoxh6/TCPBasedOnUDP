@@ -28,10 +28,13 @@ public class receiveThread extends Thread  {
                 }
                 dsk.receive(dpk);
                 synchronized (clientQueue){
-                    if(!clientQueue.isEmpty()){
-                        clientQueue.popDatagramPacket();
-                        System.out.println("remove" + num);
+                    if(receiveBuf[0]!=-1){
+                        if(!clientQueue.isEmpty()){
+                            clientQueue.popDatagramPacket();
+                            System.out.println("remove" + num);
+                        }
                     }
+                    
                 }
                 //System.out.println("yes" + num);
             }

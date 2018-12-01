@@ -15,7 +15,7 @@ public class UDPServer {
 	public static void main(String[] args) {
 		
 		System.out.println("LFTP server start....");
-		byte[] buf = new byte[UDPUtils.BUFFER_SIZE];
+		byte[] buf = new byte[UDPUtils.BUFFER_SIZE+6];
 		
 		DatagramPacket dpk = null;
 		DatagramSocket dsk = null;
@@ -40,24 +40,42 @@ public class UDPServer {
 			int readSize = 0;
 			int readCount = 0;
 			int flushSize = 0;
-			while((readSize = dpk.getLength()) != 0){  
-				if(UDPUtils.isEqualsByteArray(UDPUtils.exitData, buf, readSize)){
-					System.out.println("Server Exit ...");
-					dpk.setData(UDPUtils.exitData, 0, UDPUtils.exitData.length);
+			
+			while((readSize = dpk.getLength()) != 0){ 
+				ReliablePacket packet = new ReliablePacket(buf);
+			    System.out.println(packet.getCheckSum()); 
+				if(packet.check()){
+					if(UDPUtils.isEqualsByteArray(UDPUtils.exitData, packet.getData(), readSize-6)){
+						System.out.println("Server Exit ...");
+						dpk.setData(UDPUtils.exitData, 0, UDPUtils.exitData.length);
+						dsk.send(dpk);
+						break;
+					}
+					bos.write(packet.getData(), 0, readSize-6);
+					if(++flushSize % 1000 == 0){ 
+						flushSize = 0;
+						bos.flush();
+					}
+					byte[] a = new byte[1];
+					a[0] = packet.getAckNum();
+					dpk.setData(a, 0, 1);
 					dsk.send(dpk);
-					break;
-				}
-				bos.write(buf, 0, readSize);
-				if(++flushSize % 1000 == 0){ 
-					flushSize = 0;
-					bos.flush();
-				}
-				dpk.setData(UDPUtils.successData, 0, UDPUtils.successData.length);
-				dsk.send(dpk);
 
-				dpk.setData(buf,0, buf.length);
-				System.out.println("Receive count of "+ ( ++readCount ) +" !");
-				dsk.receive(dpk);
+					dpk.setData(buf,0, buf.length);
+					System.out.println("Receive count of "+ ( ++readCount ) +" !");
+				    dsk.receive(dpk);
+				}
+				else{
+					byte[] a = new byte[1];
+					a[0] = -1;
+					dpk.setData(a, 0, 1);
+					dsk.send(dpk);
+
+					dpk.setData(buf,0, buf.length);
+					System.out.println("Failed count of "+ ( readCount ) +" !");
+				    dsk.receive(dpk);
+				}
+				
 			}
 			bos.flush();
 		} catch (Exception e) {

@@ -12,6 +12,7 @@ public class sendThread extends Thread  {
     private DatagramSocket dsk = null;
     RandomAccessFile accessFile = null;
     byte[] buf = new byte[UDPUtils.BUFFER_SIZE];
+    byte[] Buf = new byte[UDPUtils.BUFFER_SIZE+6];
     int readSize = -1;
     extendQueue clientQueue = null;
 
@@ -23,10 +24,12 @@ public class sendThread extends Thread  {
     public void run() {
         try {
             accessFile = new RandomAccessFile(SEND_FILE_PATH, "r");
-            DatagramPacket dpk = new DatagramPacket(buf, buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
+            DatagramPacket dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
             int sendCount = 0;
             while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
-                dpk.setData(buf, 0, readSize);
+                ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, buf);
+                dpk.setData(packet.getBuf(), 0, readSize+6);
+                System.out.println(packet.getCheckSum());
                 dsk.send(dpk);
                 synchronized (clientQueue){
                     clientQueue.addDatagramPacket(dpk);
