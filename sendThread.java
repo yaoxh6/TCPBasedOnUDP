@@ -29,7 +29,7 @@ public class sendThread extends Thread  {
             while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
                 ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, buf);
                 dpk.setData(packet.getBuf(), 0, readSize+6);
-                System.out.println(packet.getCheckSum());
+
                 dsk.send(dpk);
                 synchronized (clientQueue){
                     clientQueue.addDatagramPacket(dpk);

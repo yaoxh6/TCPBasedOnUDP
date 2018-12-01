@@ -67,8 +67,8 @@ public class ReliablePacket {
 			length = buf.length-2;
 		}
 		int sum = 0, carry = 0;
-		for (int i = 0;i < length;i++){
-			sum += buf[i];
+		for (int i = 0;i < length;i+=2){
+			sum += (buf[i]&0xff)<<8|(buf[i+1]&0xff);
 			carry = sum/65536;
 			sum %= 65536;
 			sum += carry;
@@ -89,8 +89,8 @@ public class ReliablePacket {
 			length = buf.length-2;
 		}
 		int sum = 0, carry = 0;
-		for (int i = 0;i < length;i++){
-			sum += buf[i];
+		for (int i = 0;i < length;i+=2){
+			sum += (buf[i]&0xff)<<8|(buf[i+1]&0xff);
 			carry = sum/65536;
 			sum %= 65536;
 			sum += carry;

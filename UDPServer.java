@@ -43,7 +43,6 @@ public class UDPServer {
 			
 			while((readSize = dpk.getLength()) != 0){ 
 				ReliablePacket packet = new ReliablePacket(buf);
-			    System.out.println(packet.getCheckSum()); 
 				if(packet.check()){
 					if(UDPUtils.isEqualsByteArray(UDPUtils.exitData, packet.getData(), readSize-6)){
 						System.out.println("Server Exit ...");
@@ -72,7 +71,9 @@ public class UDPServer {
 					dsk.send(dpk);
 
 					dpk.setData(buf,0, buf.length);
-					System.out.println("Failed count of "+ ( readCount ) +" !");
+					int i = packet.getAckNum()&0xff;
+					System.out.println(i);
+					System.out.println("Failed count of "+ (readCount) +" !");
 				    dsk.receive(dpk);
 				}
 				
