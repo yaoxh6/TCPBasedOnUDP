@@ -6,7 +6,6 @@ class CommandRegex{
     String inputString;
     public static void main(String [] args) {
         String test1 = "LFTP lsend 172.168.18.20 2018.flv";
-
         String test2 = "LFTP lget 255.255.255.255 mylargefile";
         System.out.println(isDownLoadCommandCorret(test1) || isUpLoadCommandCorret(test1));
     }
@@ -22,7 +21,7 @@ class CommandRegex{
         if(!ca.getIsCorrect()){
             return false;
         }
-        System.out.println("Up");
+        //System.out.println("Up");
         return Pattern.matches(upLoadPattern,input);
     }
 
@@ -32,7 +31,7 @@ class CommandRegex{
         if(!ca.getIsCorrect()){
             return false;
         }
-        System.out.println("Down");
+        //System.out.println("Down");
         return Pattern.matches(downLoadPattern,input);
     }
 
