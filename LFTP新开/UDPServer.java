@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 
 public class UDPServer {
 	
-	private static final String SAVE_FILE_PATH = "2019.txt";
+	private static final String SAVE_FILE_PATH = "2019.flv";
 	
 	public static void main(String[] args) {
 		
