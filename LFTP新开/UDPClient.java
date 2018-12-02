@@ -79,6 +79,7 @@ public class UDPClient {
 						dpk.setData(SEND_FILE_PATH.getBytes(),0,SEND_FILE_PATH.getBytes().length);
 						System.out.println("Download file name: "+new String(dpk.getData()).trim());
 						dsk.send(dpk);
+
 						SEND_FILE_PATH = new String(dpk.getData()).trim();
 						DownLoad(dsk);
 						break;
@@ -216,12 +217,19 @@ public class UDPClient {
 
 			int first = 0;
 			while((readSize = dpk.getLength()) != 0){
+
 				if (first==0){
 					if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
 						System.out.println("File is not Exist");
 						break;
 					}
 					first=1;
+				}
+
+
+				if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
+					System.out.println("File is not Exist");
+					break;
 				}
 
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,Buf,dpk.getLength())){
