@@ -29,7 +29,7 @@ public class CommandAnalysis {
         FilePath = temp[3];
         File file = new File(FilePath);
         if(!file.exists() && UpOrDownLoad.equals("lsend")){
-            //System.out.println("File");
+            System.out.println("File does not exist");
             isCorrect = false;
         }
     }
