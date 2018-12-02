@@ -27,7 +27,7 @@ public class UDPClient {
 		try {
             dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
             dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName("localhost"));
-            /*≈–∂œ «∑Ò¡¨Ω”*/
+
 			if(ClientConnect(dsk,dpk)){
 				System.out.println("Connect Success");
 			}else{
@@ -37,6 +37,15 @@ public class UDPClient {
 			while(true){
 				System.out.println("please input commond");
 				command = sc.nextLine();
+//				CommandRegex cr = new CommandRegex(command);
+//				if(cr.getIsValid()){
+//					System.out.println(cr.getUpOrDownLoad());
+//					System.out.println(cr.getIpAddress());
+//					System.out.println(cr.getFilePath());
+//				}
+//				else{
+//					System.out.println("Wrong Command");
+//				}
 				if(command.equals("1")){
 					dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
 					dsk.send(dpk);
@@ -50,7 +59,7 @@ public class UDPClient {
 					break;
 				}
 				else{
-					System.out.println("Wrong Command");
+					//System.out.println("Wrong Command");
 				}
 			}
         } catch (Exception e) {
