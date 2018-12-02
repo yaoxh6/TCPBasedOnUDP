@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
 
@@ -81,6 +82,13 @@ public class UDPServer {
 			int flushSize = 0;
 
 			while((readSize = dpk.getLength()) != 0){
+				if(UDPUtils.isEqualsByteArray(UDPUtils.end,buf,dpk.getLength())){
+					byte[] a = new byte[1];
+					a[0] = 1;
+					dpk.setData(a, 0, 1);
+					dsk.send(dpk);
+					break;
+				}
 				ReliablePacket packet = new ReliablePacket(buf);
 				int t = packet.getSeqNum()&0xff;
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
@@ -141,17 +149,24 @@ public class UDPServer {
 
 				while(true){
 					dpk.setData(receiveBuf, 0, receiveBuf.length);
-					dsk.receive(dpk);
-
-					// confirm server receive
-					if(receiveBuf[0]!=1){
-						System.out.println("resend ...");
-						System.out.println(packet.getCheckSum());
+					dsk.setSoTimeout(1000);
+					try {
+						dsk.receive(dpk);
+						// confirm server receive
+						if(receiveBuf[0]!=1){
+							System.out.println("resend ...");
+							System.out.println(packet.getCheckSum());
+							dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+							dsk.send(dpk);
+						}
+						else
+							break;
+					} catch (SocketTimeoutException e) {
 						dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 						dsk.send(dpk);
+						continue;
 					}
-					else
-						break;
+					
 				}
 
 				System.out.println("Send count of " + (sendCount++) + "!");
@@ -160,6 +175,28 @@ public class UDPServer {
 					seqnum %= 127;
 				}
 				//Thread.sleep(10);
+			}
+			dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
+			dsk.send(dpk);
+			dpk.setData(receiveBuf,0,receiveBuf.length);
+			dsk.setSoTimeout(1000);
+			while(true){
+				try {
+					dsk.receive(dpk);
+					if(receiveBuf[0] == 1){
+						break;
+					}else{
+						dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
+						dsk.send(dpk);
+						dpk.setData(receiveBuf,0,receiveBuf.length);
+					}
+				} catch (SocketTimeoutException e) {
+					dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
+					dsk.send(dpk);
+					dpk.setData(receiveBuf,0,receiveBuf.length);
+					continue;
+				}
+				
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

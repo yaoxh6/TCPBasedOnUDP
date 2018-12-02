@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
 public class UDPClient {
@@ -98,7 +99,8 @@ public class UDPClient {
 			byte[] buf = new byte[UDPUtils.BUFFER_SIZE];
 			dpk.setData(Buf, 0, Buf.length);
 			RandomAccessFile accessFile = new RandomAccessFile(SEND_FILE_PATH, "r");
-			while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
+
+     		while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
 				ReliablePacket packet;
 				if(readSize==UDPUtils.BUFFER_SIZE){
 					packet = new ReliablePacket((byte)seqnum, (byte)0, (byte)0, buf);
@@ -111,20 +113,25 @@ public class UDPClient {
 				}
 
 				dsk.send(dpk);
-
+				dsk.setSoTimeout(1000);
 				while(true){
-					dpk.setData(receiveBuf, 0, receiveBuf.length);
-					dsk.receive(dpk);
-
-					// confirm server receive
-					if(receiveBuf[0]!=1){
-						System.out.println("resend ...");
-						System.out.println(packet.getCheckSum());
+					try {
+						dpk.setData(receiveBuf, 0, receiveBuf.length);
+						dsk.receive(dpk);
+						// confirm server receive
+						if(receiveBuf[0]!=1){
+							System.out.println("resend ...");
+							System.out.println(packet.getCheckSum());
+							dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+							dsk.send(dpk);
+						}
+						else
+							break;
+					} catch (SocketTimeoutException e) {
 						dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 						dsk.send(dpk);
+						continue;
 					}
-					else
-						break;
 				}
 
 				System.out.println("Send count of " + (sendCount++) + "!");
@@ -133,6 +140,30 @@ public class UDPClient {
 					seqnum %= 127;
 				}
 				//Thread.sleep(10);
+			}
+			
+			dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
+			dsk.send(dpk);
+			dpk.setData(receiveBuf,0,receiveBuf.length);
+			dsk.setSoTimeout(1000);
+			while(true){
+				try {
+					dsk.receive(dpk);
+					if(receiveBuf[0] == 1){
+						break;
+					}
+					else{
+						dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
+						dsk.send(dpk);
+						dpk.setData(receiveBuf,0,receiveBuf.length);
+					}
+				} catch (SocketTimeoutException e) {
+					dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
+					dsk.send(dpk);
+					dpk.setData(receiveBuf,0,receiveBuf.length);
+					continue;
+				}
+				
 			}
 		}
 		catch (Exception e){
@@ -153,6 +184,13 @@ public class UDPClient {
 			int flushSize = 0;
 
 			while((readSize = dpk.getLength()) != 0){
+				if(UDPUtils.isEqualsByteArray(UDPUtils.end,Buf,dpk.getLength())){
+					byte[] a = new byte[1];
+					a[0] = 1;
+					dpk.setData(a, 0, 1);
+					dsk.send(dpk);
+					break;
+				}
 				ReliablePacket packet = new ReliablePacket(Buf);
 				int t = packet.getSeqNum()&0xff;
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
