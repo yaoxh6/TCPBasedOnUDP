@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class UDPClient {
 
     private static String SEND_FILE_PATH = "2018.flv";
-    private static String IP_ADDRESS = "172.18.34.217";
+    private static String IP_ADDRESS = "172.18.33.211";
     private static DatagramPacket dpk;
     private static String UpOrDown = null;
 	public static void main(String[] args) {
