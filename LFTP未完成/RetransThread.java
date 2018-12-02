@@ -1,4 +1,4 @@
-import sun.misc.IoTrace;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -55,6 +55,8 @@ public class RetransThread extends Thread {
     public void Retransmission() throws IOException {
         dsk.send(datagramPacket);
         //System.out.println("Retransmission");
-        System.out.println("Retransmission Checksum" + datagramPacket.getData()[0]+"");
+        ReliablePacket packet = new ReliablePacket(datagramPacket);
+
+        System.out.println("Retransmission " + packet.getSeqNum()+"");
     }
 }

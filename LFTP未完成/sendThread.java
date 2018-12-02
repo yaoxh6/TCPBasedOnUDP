@@ -1,6 +1,7 @@
 import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Arrays;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.rmi.server.ExportException;
@@ -41,16 +42,23 @@ public class sendThread extends Thread  {
         try {
             accessFile = new RandomAccessFile(SEND_FILE_PATH, "r");
             DatagramPacket dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
-            int sendCount = 0;
+            int sendCount = 1;
             while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
-                ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, buf);
-                dpk.setData(packet.getBuf(), 0, readSize+6);
-                System.out.println("packet checkSum : "+packet.getCheckSum());
+                if(readSize==UDPUtils.BUFFER_SIZE){
+                    ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, buf);
+                    dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+                }
+                else{
+                    byte[] b = Arrays.copyOfRange(buf,0,readSize);
+                    ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, b);
+                    dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+                }
+                
                 synchronized (clientQueue){
                     dsk.send(dpk);
                     clientQueue.addDatagramPacket(dpk);
                     System.out.println("clientQueueLength:"+clientQueue.getCurrentQueueSize());
-                    System.out.println("Send count of " + (++sendCount) + "!");
+                    System.out.println("Send count of " + (sendCount++) + "!");
                 }
 
                 //Thread.sleep(10);
