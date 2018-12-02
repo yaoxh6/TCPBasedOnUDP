@@ -77,6 +77,7 @@ public class UDPServer {
 			int readCount = 1;
 			int flushSize = 0;
 
+			int flag = 0;
 			while((readSize = dpk.getLength()) != 0){
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,buf,dpk.getLength())){
 					byte[] a = new byte[1];
@@ -88,6 +89,10 @@ public class UDPServer {
 				ReliablePacket packet = new ReliablePacket(buf);
 				int t = packet.getSeqNum()&0xff;
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
+					if(flag==0&&readCount==2){
+						flag = 1;
+						continue;
+					}
 					bos.write(packet.getData(), 0, readSize-6);
 					if(++flushSize % 1000 == 0){
 						flushSize = 0;

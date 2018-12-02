@@ -144,7 +144,7 @@ public class UDPClient {
 						dsk.receive(dpk);
 						// confirm server receive
 						if(receiveBuf[0]!=1){
-							System.out.println("resend ...");
+							System.out.println("Packet lost! Resend.");
 							System.out.println(packet.getCheckSum());
 							dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 							dsk.send(dpk);
@@ -152,6 +152,7 @@ public class UDPClient {
 						else
 							break;
 					} catch (SocketTimeoutException e) {
+						System.out.println("Time out! Resend the packet.");
 						dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 						dsk.send(dpk);
 						continue;
