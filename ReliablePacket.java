@@ -110,8 +110,6 @@ public class ReliablePacket {
 		}
 		if(_checksum+computeSum()==65535) return true;
 		else {
-			int i = _seqnum&0xff;
-			System.out.println("Packet "+Integer.toString(i)+" error.");
 			return false;
 		}
 	}

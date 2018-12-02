@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 
 public class UDPServer {
 	
-	private static final String SAVE_FILE_PATH = "2019.flv";
+	private static final String SAVE_FILE_PATH = "2019.txt";
 	
 	public static void main(String[] args) {
 		
@@ -44,7 +44,7 @@ public class UDPServer {
 			while((readSize = dpk.getLength()) != 0){ 
 				ReliablePacket packet = new ReliablePacket(buf);
 				int t = packet.getSeqNum()&0xff;
-				if(packet.check()&&t==readCount){
+				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
 
 					bos.write(packet.getData(), 0, readSize-6);
 					if(++flushSize % 1000 == 0){ 

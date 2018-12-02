@@ -8,7 +8,7 @@ import java.rmi.server.ExportException;
 
 public class sendThread extends Thread  {
 
-    private static final String SEND_FILE_PATH = "2018.flv";
+    private static final String SEND_FILE_PATH = "2018.txt";
 
     DatagramSocket dsk = null;
     RandomAccessFile accessFile = null;
@@ -44,8 +44,16 @@ public class sendThread extends Thread  {
             DatagramPacket dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
             int sendCount = 1;
             while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
-                ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, buf);
-                dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+                if(readSize==UDPUtils.BUFFER_SIZE){
+                    ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, buf);
+                    dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+                }
+                else{
+                    byte[] b = Arrays.copyOfRange(buf,0,readSize);
+                    ReliablePacket packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, b);
+                    dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+                }
+                
                 synchronized (clientQueue){
                     dsk.send(dpk);
                     clientQueue.addDatagramPacket(dpk);
