@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 
 public class UDPClient {
 
-    private static final String SEND_FILE_PATH = "2018.mp4";
+    private static final String SEND_FILE_PATH = "2018.flv";
     
 //	private static final String SEND_FILE_PATH = "2018.flv";
 	public static void main(String[] args) {
