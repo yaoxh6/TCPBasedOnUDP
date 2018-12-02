@@ -55,16 +55,6 @@ public class UDPClient {
 				return;
 			}
 			while(true){
-//				System.out.println("please input commond");
-//				command = sc.nextLine();
-//				CommandRegex cr = new CommandRegex(command);
-//				if(cr.getIsValid()){
-//					System.out.println(cr.getUpOrDownLoad());
-//					UpOrDown = cr.getUpOrDownLoad();
-//					System.out.println(cr.getIpAddress());
-//					IP_ADDRESS = cr.getIpAddress();
-//					System.out.println(cr.getFilePath());
-//					SEND_FILE_PATH = cr.getFilePath();
 					if(UpOrDown.equals("lsend")){
 						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
 						dsk.send(dpk);
@@ -142,7 +132,6 @@ public class UDPClient {
 					try {
 						dpk.setData(receiveBuf, 0, receiveBuf.length);
 						dsk.receive(dpk);
-						// confirm server receive
 						if(receiveBuf[0]!=1){
 							System.out.println("Packet lost! Resend.");
 							System.out.println(packet.getCheckSum());
