@@ -23,6 +23,14 @@ public class UDPClient {
             accessFile = new RandomAccessFile(SEND_FILE_PATH, "r");
             DatagramPacket dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
             dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName("localhost"));
+            			/*判断是否连接*/
+			if(ClientConnect(dsk,dpk)){
+				System.out.println("Connect Success");
+			}else{
+				System.out.println("Connect Fail");
+				return;
+			}
+
             int sendCount = 1;
             int seqnum = 1;
             while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
@@ -156,25 +164,25 @@ public class UDPClient {
 //		System.out.println("time:"+(endTime - startTime));
 //	}
 
-//	private static boolean ClientConnect(DatagramSocket inputDSK,DatagramPacket inputDPK) {
-//		try{
-//			System.out.println("Send first SYN from client");
-//			inputDPK.setData(UDPUtils.connectClient,0,UDPUtils.connectClient.length);
-//			inputDSK.send(inputDPK);
-//
-//			byte[] tempReceive = new byte[100];
-//			inputDPK.setData(tempReceive,0,tempReceive.length);
-//			inputDSK.receive(inputDPK);
-//			if(UDPUtils.isEqualsByteArray(UDPUtils.connectServer, tempReceive, inputDPK.getLength())){
-//				System.out.println("Receive second SYN from server");
-//				return true;
-//			}
-//			return false;
-//		}
-//		catch (Exception e){
-//			e.printStackTrace();
-//		}
-//		return false;
-//	}
+	private static boolean ClientConnect(DatagramSocket inputDSK,DatagramPacket inputDPK) {
+		try{
+			System.out.println("Send first SYN from client");
+			inputDPK.setData(UDPUtils.connectClient,0,UDPUtils.connectClient.length);
+			inputDSK.send(inputDPK);
+
+			byte[] tempReceive = new byte[100];
+			inputDPK.setData(tempReceive,0,tempReceive.length);
+			inputDSK.receive(inputDPK);
+			if(UDPUtils.isEqualsByteArray(UDPUtils.connectServer, tempReceive, inputDPK.getLength())){
+				System.out.println("Receive second SYN from server");
+				return true;
+			}
+			return false;
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+		return false;
+	}
 
 }
