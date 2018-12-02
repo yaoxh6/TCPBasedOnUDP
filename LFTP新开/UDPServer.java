@@ -25,8 +25,7 @@ public class UDPServer {
 		DatagramSocket dsk = null;
 		BufferedOutputStream bos = null;
 		try {
-
-			dpk = new DatagramPacket(buf, buf.length,new InetSocketAddress(InetAddress.getByName("172.18.33.211"), UDPUtils.PORT));
+			dpk = new DatagramPacket(buf, buf.length,new InetSocketAddress(InetAddress.getByName("172.18.33.212"), UDPUtils.PORT));
 			dsk = new DatagramSocket(UDPUtils.PORT + 1);
 			 if(ServerConnect(dsk,dpk)){
 			 	System.out.println("Connect Success");
@@ -205,6 +204,7 @@ public class UDPServer {
 			inputDPK.setData(tempReceive,0,tempReceive.length);
 			inputDSK.receive(inputDPK);
 			System.out.println("Test address:" + inputDPK.getAddress());
+			dpk.setAddress(inputDPK.getAddress());
 			if(UDPUtils.isEqualsByteArray(UDPUtils.connectClient, tempReceive, inputDPK.getLength())){
 				System.out.println("Receive first SYN from client");
 				System.out.println("Send second SYN from server");
