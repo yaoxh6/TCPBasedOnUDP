@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 
 public class UDPServer {
 
-	private static final String SAVE_FILE_PATH = "2019.flv";
+	private static final String SAVE_FILE_PATH = "2019.txt";
     private static DatagramPacket dpk = null;
 	public static void main(String[] args) {
 
@@ -203,6 +204,7 @@ public class UDPServer {
 			byte[] tempReceive = new byte[100];
 			inputDPK.setData(tempReceive,0,tempReceive.length);
 			inputDSK.receive(inputDPK);
+			System.out.println("Test address:" + inputDPK.getAddress());
 			if(UDPUtils.isEqualsByteArray(UDPUtils.connectClient, tempReceive, inputDPK.getLength())){
 				System.out.println("Receive first SYN from client");
 				System.out.println("Send second SYN from server");

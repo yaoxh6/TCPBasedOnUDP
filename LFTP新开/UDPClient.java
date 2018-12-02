@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class UDPClient {
 
-    private static String SEND_FILE_PATH = "2018.flv";
+    private static String SEND_FILE_PATH = "2018.txt";
     private static String IP_ADDRESS = "172.18.33.211";
     private static DatagramPacket dpk;
     private static String UpOrDown = null;
@@ -26,9 +26,27 @@ public class UDPClient {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("LFTP client start...");
 		String command;
+
+		System.out.println("please input commond");
+		command = sc.nextLine();
+		CommandRegex cr = new CommandRegex(command);
+		while (true){
+			if(cr.getIsValid()) {
+				System.out.println(cr.getUpOrDownLoad());
+				UpOrDown = cr.getUpOrDownLoad();
+				System.out.println(cr.getIpAddress());
+				IP_ADDRESS = cr.getIpAddress();
+				System.out.println(cr.getFilePath());
+				SEND_FILE_PATH = cr.getFilePath();
+				break;
+			}
+			else{
+				System.out.println("Wrong Command!!!");
+			}
+		}
 		try {
             dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName(IP_ADDRESS), UDPUtils.PORT + 1));
-            dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName(IP_ADDRESS));
+            dsk = new DatagramSocket(UDPUtils.PORT);
 
 			if(ClientConnect(dsk,dpk)){
 				System.out.println("Connect Success");
@@ -37,16 +55,16 @@ public class UDPClient {
 				return;
 			}
 			while(true){
-				System.out.println("please input commond");
-				command = sc.nextLine();
-				CommandRegex cr = new CommandRegex(command);
-				if(cr.getIsValid()){
-					System.out.println(cr.getUpOrDownLoad());
-					UpOrDown = cr.getUpOrDownLoad();
-					System.out.println(cr.getIpAddress());
-					IP_ADDRESS = cr.getIpAddress();
-					System.out.println(cr.getFilePath());
-					SEND_FILE_PATH = cr.getFilePath();
+//				System.out.println("please input commond");
+//				command = sc.nextLine();
+//				CommandRegex cr = new CommandRegex(command);
+//				if(cr.getIsValid()){
+//					System.out.println(cr.getUpOrDownLoad());
+//					UpOrDown = cr.getUpOrDownLoad();
+//					System.out.println(cr.getIpAddress());
+//					IP_ADDRESS = cr.getIpAddress();
+//					System.out.println(cr.getFilePath());
+//					SEND_FILE_PATH = cr.getFilePath();
 					if(UpOrDown.equals("lsend")){
 						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
 						dsk.send(dpk);
@@ -60,10 +78,6 @@ public class UDPClient {
 						break;
 					}
 				}
-				else{
-					System.out.println("Wrong Command");
-				}
-			}
         } catch (Exception e) {
             e.printStackTrace();
         }finally{
@@ -234,3 +248,7 @@ public class UDPClient {
 		
 	}
 }
+
+/*
+LFTP lsend 172.18.33.211 2018.flv
+*/
