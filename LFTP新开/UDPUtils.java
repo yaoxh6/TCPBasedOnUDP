@@ -14,6 +14,7 @@ public class UDPUtils {
 	public static final byte[] download = "download".getBytes();
 	public static final byte[] upload = "upload".getBytes();
 	public static final byte[] end = "end".getBytes();
+	public static final byte[] fileNotExist = "The file does not exist".getBytes();
 
 	public static void main(String[] args) {
 		byte[] b = new byte[]{1};

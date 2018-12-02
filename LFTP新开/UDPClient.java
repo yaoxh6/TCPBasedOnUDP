@@ -1,4 +1,5 @@
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -56,22 +57,19 @@ public class UDPClient {
 				return;
 			}
 			while(true){
-//				System.out.println("please input commond");
-//				command = sc.nextLine();
-//				CommandRegex cr = new CommandRegex(command);
-//				if(cr.getIsValid()){
-//					System.out.println(cr.getUpOrDownLoad());
-//					UpOrDown = cr.getUpOrDownLoad();
-//					System.out.println(cr.getIpAddress());
-//					IP_ADDRESS = cr.getIpAddress();
-//					System.out.println(cr.getFilePath());
-//					SEND_FILE_PATH = cr.getFilePath();
 					if(UpOrDown.equals("lsend")){
 						dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
 						dsk.send(dpk);
 						dpk.setData(SEND_FILE_PATH.getBytes(),0,SEND_FILE_PATH.getBytes().length);
 						System.out.println("Send file name: "+new String(dpk.getData()).trim());
 						dsk.send(dpk);
+						File file = new File(SEND_FILE_PATH);
+		                if(!file.exists()){
+		                    System.out.println("File is not Exist");
+		                    dpk.setData(UDPUtils.fileNotExist);
+		                    dsk.send(dpk);
+		                    return;
+		                }
 						UpLoad(dsk);
 						break;
 					}
@@ -151,7 +149,6 @@ public class UDPClient {
 					try {
 						dpk.setData(receiveBuf, 0, receiveBuf.length);
 						dsk.receive(dpk);
-						// confirm server receive
 						if(receiveBuf[0]!=1){
 							System.out.println("Packet lost! Resend.");
 							System.out.println(packet.getCheckSum());
@@ -218,6 +215,12 @@ public class UDPClient {
 			int flushSize = 0;
 
 			while((readSize = dpk.getLength()) != 0){
+				if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
+					System.out.println("File is not Exist");
+					break;
+				}
+				
+                dsk.send(dpk);
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,Buf,dpk.getLength())){
 					byte[] a = new byte[1];
 					a[0] = 1;

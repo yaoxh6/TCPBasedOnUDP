@@ -20,7 +20,7 @@ public class CommandAnalysis {
     public void CommandSplit(){
         String[] temp = inputString.split("\\s");
         if(temp.length != 4){
-            //System.out.println("Length");
+            System.out.println("The command is not integrated");
             isCorrect = false;
             return;
         }
