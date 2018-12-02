@@ -69,6 +69,10 @@ public class UDPServerThread extends Thread {
 
             int flag = 0;
             while((readSize = dpk.getLength()) != 0){
+            	if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
+					System.out.println("File is not Exist");
+					break;
+				}
                 if(UDPUtils.isEqualsByteArray(UDPUtils.end,buf,dpk.getLength())){
                     byte[] a = new byte[1];
                     a[0] = 1;

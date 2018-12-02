@@ -1,4 +1,5 @@
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -27,10 +28,11 @@ public class UDPClient {
 		System.out.println("LFTP client start...");
 		String command;
 
-		System.out.println("please input commond");
-		command = sc.nextLine();
-		CommandRegex cr = new CommandRegex(command);
+		
 		while (true){
+			System.out.println("please input commond");
+			command = sc.nextLine();
+			CommandRegex cr = new CommandRegex(command);
 			if(cr.getIsValid()) {
 				System.out.println(cr.getUpOrDownLoad());
 				UpOrDown = cr.getUpOrDownLoad();
@@ -56,14 +58,28 @@ public class UDPClient {
 			}
 			while(true){
 					if(UpOrDown.equals("lsend")){
-						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
+						dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
 						dsk.send(dpk);
+						dpk.setData(SEND_FILE_PATH.getBytes(),0,SEND_FILE_PATH.getBytes().length);
+						System.out.println("Send file name: "+new String(dpk.getData()).trim());
+						dsk.send(dpk);
+						File file = new File(SEND_FILE_PATH);
+		                if(!file.exists()){
+		                    System.out.println("File is not Exist");
+		                    dpk.setData(UDPUtils.fileNotExist);
+		                    dsk.send(dpk);
+		                    return;
+		                }
 						UpLoad(dsk);
 						break;
 					}
 					else if(UpOrDown.equals("lget")){
-						dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
+						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
 						dsk.send(dpk);
+						dpk.setData(SEND_FILE_PATH.getBytes(),0,SEND_FILE_PATH.getBytes().length);
+						System.out.println("Download file name: "+new String(dpk.getData()).trim());
+						dsk.send(dpk);
+						SEND_FILE_PATH = new String(dpk.getData()).trim();
 						DownLoad(dsk);
 						break;
 					}
@@ -198,7 +214,16 @@ public class UDPClient {
 			int readCount = 1;
 			int flushSize = 0;
 
+			int first = 0;
 			while((readSize = dpk.getLength()) != 0){
+				if (first==0){
+					if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
+						System.out.println("File is not Exist");
+						break;
+					}
+					first=1;
+				}
+
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,Buf,dpk.getLength())){
 					byte[] a = new byte[1];
 					a[0] = 1;
