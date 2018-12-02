@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 
 public class UDPServer {
 	
-	private static final String SAVE_FILE_PATH = "2019.txt";
+	private static final String SAVE_FILE_PATH = "2019.mp4";
 	
 	public static void main(String[] args) {
 		
@@ -24,14 +24,14 @@ public class UDPServer {
 		
             dpk = new DatagramPacket(buf, buf.length,new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT));
 			dsk = new DatagramSocket(UDPUtils.PORT + 1, InetAddress.getByName("localhost"));
-			if(ServerConnect(dsk,dpk)){
-				System.out.println("Connect Success");
-				dpk.setData(buf,0,buf.length);
-			}
-			else{
-				System.out.println("Connect Fail");
-				return;
-			}
+			// if(ServerConnect(dsk,dpk)){
+			// 	System.out.println("Connect Success");
+			// 	dpk.setData(buf,0,buf.length);
+			// }
+			// else{
+			// 	System.out.println("Connect Fail");
+			// 	return;
+			// }
 			bos = new BufferedOutputStream(new FileOutputStream(SAVE_FILE_PATH));
 			dsk.receive(dpk);
 			
