@@ -1,3 +1,5 @@
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
@@ -5,12 +7,13 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.net.InetSocketAddress;
+import java.util.Scanner;
 
 public class UDPClient {
 
     private static final String SEND_FILE_PATH = "2018.flv";
-    
-//	private static final String SEND_FILE_PATH = "2018.flv";
+    private static final String IP_ADDRESS = "localhost";
+    private static DatagramPacket dpk;
 	public static void main(String[] args) {
 		DatagramSocket dsk = null;
 	    RandomAccessFile accessFile = null;
@@ -18,151 +21,51 @@ public class UDPClient {
 	    byte[] Buf = new byte[UDPUtils.BUFFER_SIZE+6];
 		byte[] receiveBuf = new byte[1];
 	    int readSize = -1;
+		Scanner sc = new Scanner(System.in);
 		System.out.println("LFTP client start...");
+		String command;
 		try {
-            accessFile = new RandomAccessFile(SEND_FILE_PATH, "r");
-            DatagramPacket dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
+            dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
             dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName("localhost"));
-            			/*åˆ¤æ–­æ˜¯å¦è¿žæŽ¥*/
+            /*ÅÐ¶ÏÊÇ·ñÁ¬½Ó*/
 			if(ClientConnect(dsk,dpk)){
 				System.out.println("Connect Success");
 			}else{
 				System.out.println("Connect Fail");
 				return;
 			}
-
-            int sendCount = 1;
-            int seqnum = 1;
-            while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
-            	ReliablePacket packet;
-                if(readSize==UDPUtils.BUFFER_SIZE){
-                    packet = new ReliablePacket((byte)seqnum, (byte)0, (byte)0, buf);
-                    dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
-                }
-                else{
-                    byte[] b = Arrays.copyOfRange(buf,0,readSize);
-                    packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, b);
-                    dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
-                }
-                
-                dsk.send(dpk);
-                
-				while(true){
-					dpk.setData(receiveBuf, 0, receiveBuf.length);
-					dsk.receive(dpk);
-					
-					// confirm server receive
-					if(receiveBuf[0]!=1){
-						System.out.println("resend ...");
-						System.out.println(packet.getCheckSum());
-						dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
-						dsk.send(dpk);
-					}
-					else
-						break;
+			while(true){
+				System.out.println("please input commond");
+				command = sc.nextLine();
+				if(command.equals("1")){
+					dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
+					dsk.send(dpk);
+					UpLoad(dsk);
+					break;
 				}
-				
-                System.out.println("Send count of " + (sendCount++) + "!");
-                seqnum++;
-                if(seqnum>127){
-                	seqnum %= 127;
-                }
-                //Thread.sleep(10);
-            }
+				else if(command.equals("2")){
+					dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
+					dsk.send(dpk);
+					DownLoad(dsk);
+					break;
+				}
+				else{
+					System.out.println("Wrong Command");
+				}
+			}
         } catch (Exception e) {
             e.printStackTrace();
         }finally{
-//            try {
-//                if(accessFile != null)
-//                    accessFile.close();
-//                if(dsk != null)
-//                    dsk.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                if(accessFile != null)
+                    accessFile.close();
+                if(dsk != null)
+                    dsk.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 	}
-
-//		long startTime = System.currentTimeMillis();
-//
-//		byte[] buf = new byte[UDPUtils.BUFFER_SIZE];
-//		byte[] receiveBuf = new byte[1];
-//
-//		ClientQueue clientQueue = new ClientQueue();
-//		RandomAccessFile accessFile = null;
-//		DatagramPacket dpk = null;
-//		DatagramSocket dsk = null;
-//		int readSize = -1;
-//		try {
-//			accessFile = new RandomAccessFile(SEND_FILE_PATH,"r");
-//			dpk = new DatagramPacket(buf, buf.length,new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
-//			dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName("localhost"));
-//
-//			/*åˆ¤æ–­æ˜¯å¦è¿žæŽ¥*/
-//			if(ClientConnect(dsk,dpk)){
-//				System.out.println("Connect Success");
-//			}else{
-//				System.out.println("Connect Fail");
-//				return;
-//			}
-//
-////			int sendCount = 0;
-////			while((readSize = accessFile.read(buf,0,buf.length)) != -1){
-////				dpk.setData(buf, 0, readSize);
-////				dsk.send(dpk);
-////				{
-////					while(true){
-////						dpk.setData(receiveBuf, 0, receiveBuf.length);
-////						dsk.receive(dpk);
-////
-////						if(!UDPUtils.isEqualsByteArray(UDPUtils.successData,receiveBuf,dpk.getLength())){
-////							System.out.println("resend ...");
-////							dpk.setData(buf, 0, readSize);
-////							dsk.send(dpk);
-////						}else
-////							break;
-////					}
-////				}
-////				System.out.println("send count of "+(++sendCount)+"!");
-////			}
-//			int sendCount = 0;
-//			while((readSize = accessFile.read(buf,0,buf.length)) != -1){
-//				dpk.setData(buf, 0, readSize);
-//				dsk.send(dpk);
-//				clientQueue.setDatagramPacket(sendCount,dpk);
-//				System.out.println("Send count of "+(++sendCount)+"!");
-//			}
-//
-//			while(true){
-//				System.out.println("Client send exit message ....");
-//				dpk.setData(UDPUtils.exitData,0,UDPUtils.exitData.length);
-//				dsk.send(dpk);
-//
-//				dpk.setData(receiveBuf,0,receiveBuf.length);
-//				dsk.receive(dpk);
-//				// byte[] receiveData = dpk.getData();
-//				if(!UDPUtils.isEqualsByteArray(UDPUtils.exitData, receiveBuf, dpk.getLength())){
-//					System.out.println("Client Resend exit message ....");
-//					dsk.send(dpk);
-//				}else
-//					break;
-//			}
-//		}catch (Exception e) {
-//			e.printStackTrace();
-//		} finally{
-//			try {
-//				if(accessFile != null)
-//					accessFile.close();
-//				if(dsk != null)
-//					dsk.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		long endTime = System.currentTimeMillis();
-//		System.out.println("time:"+(endTime - startTime));
-//	}
 
 	private static boolean ClientConnect(DatagramSocket inputDSK,DatagramPacket inputDPK) {
 		try{
@@ -185,4 +88,101 @@ public class UDPClient {
 		return false;
 	}
 
+	public static void UpLoad(DatagramSocket dsk){
+		try{
+			int sendCount = 1;
+			int seqnum = 1;
+			int readSize = -1;
+			byte[] Buf = new byte[UDPUtils.BUFFER_SIZE+6];
+			byte[] receiveBuf = new byte[1];
+			byte[] buf = new byte[UDPUtils.BUFFER_SIZE];
+			dpk.setData(Buf, 0, Buf.length);
+			RandomAccessFile accessFile = new RandomAccessFile(SEND_FILE_PATH, "r");
+			while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
+				ReliablePacket packet;
+				if(readSize==UDPUtils.BUFFER_SIZE){
+					packet = new ReliablePacket((byte)seqnum, (byte)0, (byte)0, buf);
+					dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+				}
+				else{
+					byte[] b = Arrays.copyOfRange(buf,0,readSize);
+					packet = new ReliablePacket((byte)sendCount, (byte)0, (byte)0, b);
+					dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+				}
+
+				dsk.send(dpk);
+
+				while(true){
+					dpk.setData(receiveBuf, 0, receiveBuf.length);
+					dsk.receive(dpk);
+
+					// confirm server receive
+					if(receiveBuf[0]!=1){
+						System.out.println("resend ...");
+						System.out.println(packet.getCheckSum());
+						dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
+						dsk.send(dpk);
+					}
+					else
+						break;
+				}
+
+				System.out.println("Send count of " + (sendCount++) + "!");
+				seqnum++;
+				if(seqnum>127){
+					seqnum %= 127;
+				}
+				//Thread.sleep(10);
+			}
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public static void DownLoad(DatagramSocket dsk){
+		try{
+		    byte[] Buf = new byte[UDPUtils.BUFFER_SIZE+6];
+		    
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(SEND_FILE_PATH));
+			dpk.setData(Buf, 0, Buf.length);
+			dsk.receive(dpk);
+
+			int readSize = 0;
+			int readCount = 1;
+			int flushSize = 0;
+
+			while((readSize = dpk.getLength()) != 0){
+				ReliablePacket packet = new ReliablePacket(Buf);
+				int t = packet.getSeqNum()&0xff;
+				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
+					bos.write(packet.getData(), 0, readSize-6);
+					if(++flushSize % 1000 == 0){
+						flushSize = 0;
+						bos.flush();
+					}
+					byte[] a = new byte[1];
+					a[0] = 1;
+					dpk.setData(a, 0, 1);
+					dsk.send(dpk);
+					dpk.setData(Buf,0, Buf.length);
+					System.out.println("Receive count of "+ ( readCount++ ) +" !");
+					dsk.receive(dpk);
+				}
+				else{
+					byte[] a = new byte[1];
+					a[0] = 0;
+					dpk.setData(a, 0, 1);
+					dsk.send(dpk);
+
+					dpk.setData(Buf,0, Buf.length);
+					System.out.println("Failed count of "+ (readCount) +" !");
+					dsk.receive(dpk);
+				}
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+	}
 }

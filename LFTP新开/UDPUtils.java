@@ -10,8 +10,10 @@ public class UDPUtils {
 	public static final byte[] connectClient = "SYNClient".getBytes();
 	public static final byte[] connectServer = "SYNServer".getBytes();
 	public static final byte[] successData = "success data mark".getBytes();
-	public static final byte[] exitData = "exit data mark".getBytes(); 
-	
+	public static final byte[] exitData = "exit data mark".getBytes();
+	public static final byte[] download = "download".getBytes();
+	public static final byte[] upload = "upload".getBytes();
+
 	public static void main(String[] args) {
 		byte[] b = new byte[]{1};
 		System.out.println(isEqualsByteArray(successData,b));
