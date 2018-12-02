@@ -2,26 +2,36 @@ import java.net.DatagramPacket;
 
 public class RetransThread extends Thread {
     long endTime;
-    Time sendTime;
+    long startTime;
     long totalTime = 2000;
     DatagramPacket datagramPacket;
     extendQueue clientQueue;
     boolean isTimeout;
-    public RetransThread(long endTime,Time sendTime,DatagramPacket datagramPacket,extendQueue clientQueue){
+    public RetransThread(long endTime,long startTime,DatagramPacket datagramPacket,extendQueue clientQueue){
         this.endTime = endTime;
-        this.sendTime = sendTime;
+        this.startTime = startTime;
         this.datagramPacket = datagramPacket;
         this.clientQueue = clientQueue;
         isTimeout = false;
+        System.out.println("TimeKeeper");
     }
+
     @Override
     public void run() {
-        System.out.println("timer");
-        endTime = System.currentTimeMillis();
-        long periodTime = endTime - sendTime.startTime;
-        System.out.println(sendTime.startTime+" "+endTime);
-        if(periodTime > totalTime){
-            isTimeout = true;
+        while(true){
+            endTime = System.currentTimeMillis();
+            long periodTime = endTime - startTime;
+            System.out.println(startTime+" "+endTime+" "+periodTime+" "+totalTime);
+            if(periodTime >= totalTime){
+                isTimeout = true;
+                System.out.println("TimeOut!!!");
+                ReTimeKeeper(clientQueue.getClientQueue().peek());
+            }
         }
+    }
+
+    public void ReTimeKeeper(DatagramPacket datagramPacket){
+        this.datagramPacket = datagramPacket;
+        this.startTime = System.currentTimeMillis();
     }
 }

@@ -1410,38 +1410,4 @@ $(function() {
 		var url = $("#url").val();
 		var email = $("#email").val();
 		if(isBlank(author) && is_user_logged_in==0) {
-			statusdiv.html('<p  class="ajax-error">请输入昵称！</p>').show();
-		} else if(isBlank(email)  && is_user_logged_in==0) {
-			statusdiv.html('<p  class="ajax-error">请输入邮箱！</p>').show();
-		} else {
-			// var formdata=commentform.serialize() + "&comment=" + noteContent ;
-			// 添加状态信息
-			statusdiv.html('<p>Processing...</p>').show();
-			// 获取表单提交地址
-			var formurl=commentform.attr('action');
-			
-			// 异步提交
-			$.ajax({
-					type: 'post',
-					url: formurl,
-					dataType:'json',
-					data: {"comment_parent":comment_parent,"comment_post_ID":comment_post_ID, "_wp_unfiltered_html_comment":_wp_unfiltered_html_comment,"comment":comment,"url":url, "email":email,"author":author},
-					error: function(XMLHttpRequest, textStatus, errorThrown){
-					statusdiv.html('<p class="ajax-error" >数据不完整或表单提交太快了！</p>').show();
-				},
-				success: function(data, textStatus){
-					if(data.errorno=="0") {
-						$("#submit").prop('disabled', true);
-						statusdiv.html('<p class="ajax-success" >笔记已提交审核，感谢分享笔记！</p>').show();
-						alert('笔记已提交审核，感谢分享笔记！');
-					}else{
-						statusdiv.html('<p class="ajax-error" >'+data.msg+'</p>').show();
-					}
-					commentform.find('textarea[name=comment]').val('');
-				}
-			});
-			setTimeout(function(){
-		        $("#submit").prop('disabled', false);
-		    }, 10*1000);
-		}
-		return
+			statusdiv.html('<p  class="ajax-err
