@@ -26,7 +26,7 @@ public class UDPServer {
 		try {
 
 			dpk = new DatagramPacket(buf, buf.length,new InetSocketAddress(InetAddress.getByName("172.18.33.211"), UDPUtils.PORT));
-			dsk = new DatagramSocket(UDPUtils.PORT + 1, InetAddress.getByName("172.18.33.211"));
+			dsk = new DatagramSocket(UDPUtils.PORT + 1);
 			 if(ServerConnect(dsk,dpk)){
 			 	System.out.println("Connect Success");
 			 	dpk.setData(buf,0,buf.length);

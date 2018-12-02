@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class UDPClient {
 
     private static String SEND_FILE_PATH = "2018.flv";
-    private static String IP_ADDRESS = "172.18.33.211";
+    private static String IP_ADDRESS = "172.18.34.217";
     private static DatagramPacket dpk;
     private static String UpOrDown = null;
 	public static void main(String[] args) {
@@ -28,7 +28,7 @@ public class UDPClient {
 		String command;
 		try {
             dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName(IP_ADDRESS), UDPUtils.PORT + 1));
-            dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName(IP_ADDRESS));
+            dsk = new DatagramSocket(UDPUtils.PORT);
 
 			if(ClientConnect(dsk,dpk)){
 				System.out.println("Connect Success");
@@ -192,6 +192,7 @@ public class UDPClient {
 			int readSize = 0;
 			int readCount = 1;
 			int flushSize = 0;
+			int flag = 0;
 
 			while((readSize = dpk.getLength()) != 0){
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,Buf,dpk.getLength())){
@@ -204,6 +205,9 @@ public class UDPClient {
 				ReliablePacket packet = new ReliablePacket(Buf);
 				int t = packet.getSeqNum()&0xff;
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
+					if(readCount==100){
+						continue;
+					}
 					bos.write(packet.getData(), 0, readSize-6);
 					if(++flushSize % 1000 == 0){
 						flushSize = 0;
