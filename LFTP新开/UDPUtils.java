@@ -13,6 +13,7 @@ public class UDPUtils {
 	public static final byte[] exitData = "exit data mark".getBytes();
 	public static final byte[] download = "download".getBytes();
 	public static final byte[] upload = "upload".getBytes();
+	public static final byte[] end = "end".getBytes();
 
 	public static void main(String[] args) {
 		byte[] b = new byte[]{1};
