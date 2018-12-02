@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,7 +9,7 @@ public class sendThread extends Thread  {
 
     private static final String SEND_FILE_PATH = "2018.txt";
 
-    private DatagramSocket dsk = null;
+    DatagramSocket dsk = null;
     RandomAccessFile accessFile = null;
     byte[] buf = new byte[UDPUtils.BUFFER_SIZE];
     byte[] Buf = new byte[UDPUtils.BUFFER_SIZE+6];
@@ -23,7 +22,7 @@ public class sendThread extends Thread  {
     public sendThread(DatagramSocket dsk,extendQueue clientQueue){
         this.dsk = dsk;
         this.clientQueue = clientQueue;
-        rt = new RetransThread(System.currentTimeMillis(),System.currentTimeMillis(),null,clientQueue);
+        rt = new RetransThread(System.currentTimeMillis(),System.currentTimeMillis(),null,clientQueue,dsk);
         t3 = new Thread(rt);
         t3.start();
     }
