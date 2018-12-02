@@ -216,12 +216,11 @@ public class UDPClient {
 			int readCount = 1;
 			int flushSize = 0;
 
-
 			int first = 0;
 			while((readSize = dpk.getLength()) != 0){
 
 				if (first==0){
-					if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
+					if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, Buf, dpk.getLength())){
 
 						System.out.println("File is not Exist");
 						break;
