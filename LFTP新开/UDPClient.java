@@ -27,10 +27,11 @@ public class UDPClient {
 		System.out.println("LFTP client start...");
 		String command;
 
-		System.out.println("please input commond");
-		command = sc.nextLine();
-		CommandRegex cr = new CommandRegex(command);
+		
 		while (true){
+			System.out.println("please input commond");
+			command = sc.nextLine();
+			CommandRegex cr = new CommandRegex(command);
 			if(cr.getIsValid()) {
 				System.out.println(cr.getUpOrDownLoad());
 				UpOrDown = cr.getUpOrDownLoad();
@@ -66,14 +67,21 @@ public class UDPClient {
 //					System.out.println(cr.getFilePath());
 //					SEND_FILE_PATH = cr.getFilePath();
 					if(UpOrDown.equals("lsend")){
-						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
+						dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
+						dsk.send(dpk);
+						dpk.setData(SEND_FILE_PATH.getBytes(),0,SEND_FILE_PATH.getBytes().length);
+						System.out.println("Send file name: "+new String(dpk.getData()).trim());
 						dsk.send(dpk);
 						UpLoad(dsk);
 						break;
 					}
 					else if(UpOrDown.equals("lget")){
-						dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
+						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
 						dsk.send(dpk);
+						dpk.setData(SEND_FILE_PATH.getBytes(),0,SEND_FILE_PATH.getBytes().length);
+						System.out.println("Download file name: "+new String(dpk.getData()).trim());
+						dsk.send(dpk);
+						SEND_FILE_PATH = new String(dpk.getData()).trim();
 						DownLoad(dsk);
 						break;
 					}

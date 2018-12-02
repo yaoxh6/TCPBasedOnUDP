@@ -28,7 +28,7 @@ public class CommandAnalysis {
         IPAddress = temp[2];
         FilePath = temp[3];
         File file = new File(FilePath);
-        if(!file.exists()){
+        if(!file.exists() && UpOrDownLoad.equals("lsend")){
             //System.out.println("File");
             isCorrect = false;
         }
