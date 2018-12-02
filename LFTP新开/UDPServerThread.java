@@ -68,9 +68,11 @@ public class UDPServerThread extends Thread {
             int flushSize = 0;
 
             int flag = 0;
+            int first = 0;
             while((readSize = dpk.getLength()) != 0){
-            	if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
+            	if(first==0&&UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
 					System.out.println("File is not Exist");
+					first=1;
 					break;
 				}
                 if(UDPUtils.isEqualsByteArray(UDPUtils.end,buf,dpk.getLength())){
@@ -83,11 +85,6 @@ public class UDPServerThread extends Thread {
                 ReliablePacket packet = new ReliablePacket(buf);
                 int t = packet.getSeqNum()&0xff;
                 if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
-                    if(flag==0&&readCount==2){
-                        flag = 1;
-                        dsk.receive(dpk);
-                        continue;
-                    }
                     bos.write(packet.getData(), 0, readSize-6);
                     if(++flushSize % 1000 == 0){
                         flushSize = 0;

@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
+
 public class UDPClient {
 
     private static String SEND_FILE_PATH = "2018.txt";
@@ -215,21 +216,17 @@ public class UDPClient {
 			int readCount = 1;
 			int flushSize = 0;
 
+
 			int first = 0;
 			while((readSize = dpk.getLength()) != 0){
 
 				if (first==0){
 					if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
+
 						System.out.println("File is not Exist");
 						break;
 					}
 					first=1;
-				}
-
-
-				if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, dpk.getData(), dpk.getLength())){
-					System.out.println("File is not Exist");
-					break;
 				}
 
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,Buf,dpk.getLength())){
