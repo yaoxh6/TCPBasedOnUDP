@@ -1,3 +1,5 @@
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
@@ -9,8 +11,9 @@ import java.util.Scanner;
 
 public class UDPClient {
 
-    private static final String SEND_FILE_PATH = "2018.txt";
+    private static final String SEND_FILE_PATH = "2018.flv";
     private static final String IP_ADDRESS = "localhost";
+    private static DatagramPacket dpk;
 	public static void main(String[] args) {
 		DatagramSocket dsk = null;
 	    RandomAccessFile accessFile = null;
@@ -22,9 +25,9 @@ public class UDPClient {
 		System.out.println("LFTP client start...");
 		String command;
 		try {
-            DatagramPacket dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
+            dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
             dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName("localhost"));
-            /*Âà§Êñ≠ÊòØÂê¶ËøûÊé•*/
+            /*≈–∂œ «∑Ò¡¨Ω”*/
 			if(ClientConnect(dsk,dpk)){
 				System.out.println("Connect Success");
 			}else{
@@ -35,11 +38,15 @@ public class UDPClient {
 				System.out.println("please input commond");
 				command = sc.nextLine();
 				if(command.equals("1")){
+					dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
+					dsk.send(dpk);
 					UpLoad(dsk);
 					break;
 				}
 				else if(command.equals("2")){
-					DownLoad();
+					dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
+					dsk.send(dpk);
+					DownLoad(dsk);
 					break;
 				}
 				else{
@@ -89,6 +96,7 @@ public class UDPClient {
 			byte[] Buf = new byte[UDPUtils.BUFFER_SIZE+6];
 			byte[] receiveBuf = new byte[1];
 			byte[] buf = new byte[UDPUtils.BUFFER_SIZE];
+			dpk.setData(Buf, 0, Buf.length);
 			RandomAccessFile accessFile = new RandomAccessFile(SEND_FILE_PATH, "r");
 			while ((readSize = accessFile.read(buf, 0, buf.length)) != -1) {
 				ReliablePacket packet;
@@ -132,8 +140,49 @@ public class UDPClient {
 		}
 	}
 
-	public static void DownLoad(){
+	public static void DownLoad(DatagramSocket dsk){
+		try{
+		    byte[] Buf = new byte[UDPUtils.BUFFER_SIZE+6];
+		    
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(SEND_FILE_PATH));
+			dpk.setData(Buf, 0, Buf.length);
+			dsk.receive(dpk);
 
+			int readSize = 0;
+			int readCount = 1;
+			int flushSize = 0;
+
+			while((readSize = dpk.getLength()) != 0){
+				ReliablePacket packet = new ReliablePacket(Buf);
+				int t = packet.getSeqNum()&0xff;
+				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
+					bos.write(packet.getData(), 0, readSize-6);
+					if(++flushSize % 1000 == 0){
+						flushSize = 0;
+						bos.flush();
+					}
+					byte[] a = new byte[1];
+					a[0] = 1;
+					dpk.setData(a, 0, 1);
+					dsk.send(dpk);
+					dpk.setData(Buf,0, Buf.length);
+					System.out.println("Receive count of "+ ( readCount++ ) +" !");
+					dsk.receive(dpk);
+				}
+				else{
+					byte[] a = new byte[1];
+					a[0] = 0;
+					dpk.setData(a, 0, 1);
+					dsk.send(dpk);
+
+					dpk.setData(Buf,0, Buf.length);
+					System.out.println("Failed count of "+ (readCount) +" !");
+					dsk.receive(dpk);
+				}
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 	}
-
 }
