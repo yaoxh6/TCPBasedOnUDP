@@ -5,7 +5,7 @@ class CommandRegex{
     static CommandAnalysis ca;
     String inputString;
     public static void main(String [] args) {
-        String test1 = "LFTP lsend 172.168.18.20 2018.flv";
+        String test1 = "LFTP lsend 172.18.34.217 2018.flv";
 
         String test2 = "LFTP lget 255.255.255.255 mylargefile";
         System.out.println(isDownLoadCommandCorret(test1) || isUpLoadCommandCorret(test1));

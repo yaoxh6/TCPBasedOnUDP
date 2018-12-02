@@ -12,9 +12,10 @@ import java.util.Scanner;
 
 public class UDPClient {
 
-    private static final String SEND_FILE_PATH = "2018.flv";
-    private static final String IP_ADDRESS = "localhost";
+    private static String SEND_FILE_PATH = "2018.flv";
+    private static String IP_ADDRESS = "172.18.34.217";
     private static DatagramPacket dpk;
+    private static String UpOrDown = null;
 	public static void main(String[] args) {
 		DatagramSocket dsk = null;
 	    RandomAccessFile accessFile = null;
@@ -26,8 +27,8 @@ public class UDPClient {
 		System.out.println("LFTP client start...");
 		String command;
 		try {
-            dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName("localhost"), UDPUtils.PORT + 1));
-            dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName("localhost"));
+            dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName(IP_ADDRESS), UDPUtils.PORT + 1));
+            dsk = new DatagramSocket(UDPUtils.PORT, InetAddress.getByName(IP_ADDRESS));
 
 			if(ClientConnect(dsk,dpk)){
 				System.out.println("Connect Success");
@@ -38,29 +39,29 @@ public class UDPClient {
 			while(true){
 				System.out.println("please input commond");
 				command = sc.nextLine();
-//				CommandRegex cr = new CommandRegex(command);
-//				if(cr.getIsValid()){
-//					System.out.println(cr.getUpOrDownLoad());
-//					System.out.println(cr.getIpAddress());
-//					System.out.println(cr.getFilePath());
-//				}
-//				else{
-//					System.out.println("Wrong Command");
-//				}
-				if(command.equals("1")){
-					dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
-					dsk.send(dpk);
-					UpLoad(dsk);
-					break;
-				}
-				else if(command.equals("2")){
-					dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
-					dsk.send(dpk);
-					DownLoad(dsk);
-					break;
+				CommandRegex cr = new CommandRegex(command);
+				if(cr.getIsValid()){
+					System.out.println(cr.getUpOrDownLoad());
+					UpOrDown = cr.getUpOrDownLoad();
+					System.out.println(cr.getIpAddress());
+					IP_ADDRESS = cr.getIpAddress();
+					System.out.println(cr.getFilePath());
+					SEND_FILE_PATH = cr.getFilePath();
+					if(UpOrDown.equals("lsend")){
+						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
+						dsk.send(dpk);
+						UpLoad(dsk);
+						break;
+					}
+					else if(UpOrDown.equals("lget")){
+						dpk.setData(UDPUtils.upload,0,UDPUtils.upload.length);
+						dsk.send(dpk);
+						DownLoad(dsk);
+						break;
+					}
 				}
 				else{
-					//System.out.println("Wrong Command");
+					System.out.println("Wrong Command");
 				}
 			}
         } catch (Exception e) {
