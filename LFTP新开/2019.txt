@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!-- saved from url=(0051)http://www.runoob.com/java/java-multithreading.html -->
 <html class="gr__runoob_com"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
@@ -21,66 +21,7 @@
      <script src="//cdn.staticfile.org/jquery/1.9.1/jquery.min.js"></script>
      <script src="//cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
   <![endif]-->
-  <link rel="apple-touch-icon" href="http://static.runoob.com/images/icon/mobile-icon.png">
-  <meta name="apple-mobile-web-app-title" content="菜鸟教程">
-<link rel="stylesheet" type="text/css" href="./Java 多线程编程 _ 菜鸟教程_files/prettify.css"><script>//remove 17173 video ad
-doAdblock();
-function doAdblock(){
-    (function() {
-        function A() {}
-        A.prototype = {
-            rules: {
-                '17173_in':{
-                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/PreloaderFile(Customer)?\.swf/,
-                    'replace':"http://swf.adtchrome.com/17173_in_20150522.swf"
-                },
-                '17173_out':{
-                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/PreloaderFileFirstpage\.swf/,
-                    'replace':"http://swf.adtchrome.com/17173_out_20150522.swf"
-                },
-                '17173_live':{
-                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/Player_stream(_firstpage)?\.swf/,
-                    'replace':"http://swf.adtchrome.com/17173_stream_20150522.swf"
-                },
-                '17173_live_out':{
-                    'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/Player_stream_(custom)?Out\.swf/,
-                    'replace':"http://swf.adtchrome.com/17173.out.Live.swf"
-                }
-            },
-            _done: null,
-            get done() {
-                if(!this._done) {
-                    this._done = new Array();
-                }
-                return this._done;
-            },
-            addAnimations: function() {
-                var style = document.createElement('style');
-                style.type = 'text/css';
-                style.innerHTML = 'object,embed{\
-                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;\
-                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;\
-                -o-animation-duration:.001s;-o-animation-name:playerInserted;\
-                animation-duration:.001s;animation-name:playerInserted;}\
-                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
-                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
-                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
-                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}';
-                document.getElementsByTagName('head')[0].appendChild(style);
-            },
-            animationsHandler: function(e) {
-                if(e.animationName === 'playerInserted') {
-                    this.replace(e.target);
-                }
-            },
-            replace: function(elem) {
-                if(this.done.indexOf(elem) != -1) return;
-                this.done.push(elem);
-                var player = elem.data || elem.src;
-                if(!player) return;
-                var i, find, replace = false;
-                for(i in this.rules) {
-                    find = this.rules[i]['find'];
+  <link rel="apple-touch-icon" 
                     if(find.test(player)) {
                         replace = this.rules[i]['replace'];
                         if('function' === typeof this.rules[i]['preHandle']) {
@@ -197,42 +138,7 @@ if (document.URL.indexOf("iqiyi.com") >= 0){
 			<ul class="pc-nav">
 				<li><a href="http://www.runoob.com/">首页</a></li>
 				<li><a href="http://www.runoob.com/html/html-tutorial.html">HTML</a></li>
-				<li><a href="http://www.runoob.com/css/css-tutorial.html">CSS</a></li>
-				<li><a href="http://www.runoob.com/js/js-tutorial.html">JavaScript</a></li>
-				<li><a href="http://www.runoob.com/jquery/jquery-tutorial.html">jQuery</a></li>
-				<li><a href="http://www.runoob.com/bootstrap/bootstrap-tutorial.html">Bootstrap</a></li>
-				<li><a href="http://www.runoob.com/sql/sql-tutorial.html">SQL</a></li>
-				<li><a href="http://www.runoob.com/mysql/mysql-tutorial.html">MySQL</a></li>
-				<li><a href="http://www.runoob.com/php/php-tutorial.html">PHP</a></li>
-				<li><a href="http://www.runoob.com/python/python-tutorial.html">Python2</a></li>
-				<li><a href="http://www.runoob.com/python3/python3-tutorial.html">Python3</a></li>
-				<li><a href="http://www.runoob.com/cprogramming/c-tutorial.html">C</a></li>
-				<li><a href="http://www.runoob.com/cplusplus/cpp-tutorial.html">C++</a></li>
-				<li><a href="http://www.runoob.com/csharp/csharp-tutorial.html">C#</a></li>
-				<li><a href="http://www.runoob.com/java/java-tutorial.html">Java</a></li>
-				<li><a href="http://www.runoob.com/browser-history">本地书签</a></li>
-				
-				<!--
-				<li><a href="javascript:;" class="runoob-pop">登录</a></li>
-				-->
-      		</ul>
-			<ul class="mobile-nav">
-				<li><a href="http://www.runoob.com/">首页</a></li>
-				<li><a href="http://www.runoob.com/html/html-tutorial.html">HTML</a></li>
-				<li><a href="http://www.runoob.com/css/css-tutorial.html">CSS</a></li>
-				<li><a href="http://www.runoob.com/js/js-tutorial.html">JS</a></li>
-				<li><a href="http://www.runoob.com/browser-history">本地书签</a></li>
-				<a href="javascript:void(0)" class="search-reveal">Search</a> 
-			</ul>
-			
-		</div>
-	</div>
-</div><!--  内容  -->
-<div class="container main">
-	<!-- 中间 -->
-	<div class="row">
-	
-<div class="col left-column">
+				<li><a href="http://www.runoob.com/css/css-tutorial.html">CSS</a></li
 	<div class="tab">Java 教程	<a data-cate="53" href="javascript:void(0);" title="夜间模式" id="moon"><i class="fa fa-moon-o" aria-hidden="true" style="font-size: 1.4em;float: right;margin: 4px 6px 0;"></i></a>
 	<a data-cate="53" style="display:none;" href="javascript:void(0);" title="日间模式" id="sun"><i class="fa fa-sun-o" aria-hidden="true" style="font-size: 1.4em;float: right;margin: 4px 6px 0;"></i></a>
 	</div>
@@ -3648,64 +3554,5 @@ ol,ul{list-style:none}.cd-switcher a{text-decoration:none;outline:0}.cd-switcher
 				<p class="fieldset">
 					<input type="checkbox" id="remember-me" checked="">
 					<label for="remember-me">记住登录状态</label>
-          <a href="http://www.runoob.com/reset-password" style="float: right;padding-right: 20px;" target="_blank">忘记密码？</a>
-				</p>
- 				<input type="hidden" name="action" value="signin">
-				<p class="fieldset">
-					<input class="full-width2" type="submit" value="登 录">
-				</p>
-        <div class="err-msg"></div>
-			</div>
-		</div>
-
-		<div id="cd-signup"> <!-- 注册表单 -->
-			<div class="cd-form">
-				<p class="fieldset">
-					<label class="image-replace cd-password" for="verifycode">邀请码</label>
-					<input class="full-width has-padding has-border" id="signup-verifycode" name="verifycode" type="text" placeholder="输入邀请码">
-				</p>
-				<p class="fieldset">
-					<label class="image-replace cd-username" for="signup-username">用户名</label>
-					<input class="full-width has-padding has-border" id="signup-username" name="name" type="text" placeholder="输入用户名">
-				</p>
-
-				<p class="fieldset">
-					<label class="image-replace cd-email" for="signup-email">邮箱</label>
-					<input class="full-width has-padding has-border" name="email" id="signup-email" type="email" placeholder="输入mail">
-				</p>
-
-				<p class="fieldset">
-					<label class="image-replace cd-password" for="signup-password">密码</label>
-					<input class="full-width has-padding has-border" id="signup-password" name="password" type="password" placeholder="输入密码">
-				</p>
-				<p class="fieldset">
-					<label class="image-replace cd-password" for="signup-password2">重复输入密码</label>
-					<input class="full-width has-padding has-border" id="signup-password2" name="password2" type="password" placeholder="重复输入密码">
-				</p>
-				
-				<!-- 
-				<p class="fieldset">
-					<input type="checkbox" id="accept-terms">
-					<label for="accept-terms">我已阅读并同意 <a href="javascript:;">用户协议</a></label>
-				</p>
-				 -->
-				 
-				 <input type="hidden" name="action" value="signup">
-				<p class="fieldset">
-					<input class="full-width2" type="submit" value="注册新用户">
-				</p>
-				<p class="fieldset">
-				  <a href="http://www.runoob.com/w3cnote/runoob-user-test-intro.html#invite" target="_blank">如何获取邀请码？</a>
-				  </p>
-				<div class="err-msg"></div>
-			</div>
-
-		</div>
-
-		<a href="javascript:;" class="cd-close-form">关闭</a>
-	</div>
-</div> 
-<script src="./Java 多线程编程 _ 菜鸟教程_files/main.js.下载"></script>
-
-
+          <a href="http://www.runoob.com/reset-password" style="float: 
 </body></html>
