@@ -12,8 +12,8 @@ import java.util.Scanner;
 
 public class UDPClient {
 
-    private static String SEND_FILE_PATH = "2018.flv";
-    private static String IP_ADDRESS = "172.18.34.217";
+    private static String SEND_FILE_PATH = "2018.txt";
+    private static String IP_ADDRESS = "172.18.33.211";
     private static DatagramPacket dpk;
     private static String UpOrDown = null;
 	public static void main(String[] args) {
@@ -26,6 +26,24 @@ public class UDPClient {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("LFTP client start...");
 		String command;
+
+		System.out.println("please input commond");
+		command = sc.nextLine();
+		CommandRegex cr = new CommandRegex(command);
+		while (true){
+			if(cr.getIsValid()) {
+				System.out.println(cr.getUpOrDownLoad());
+				UpOrDown = cr.getUpOrDownLoad();
+				System.out.println(cr.getIpAddress());
+				IP_ADDRESS = cr.getIpAddress();
+				System.out.println(cr.getFilePath());
+				SEND_FILE_PATH = cr.getFilePath();
+				break;
+			}
+			else{
+				System.out.println("Wrong Command!!!");
+			}
+		}
 		try {
             dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName(IP_ADDRESS), UDPUtils.PORT + 1));
             dsk = new DatagramSocket(UDPUtils.PORT);
@@ -37,16 +55,16 @@ public class UDPClient {
 				return;
 			}
 			while(true){
-				System.out.println("please input commond");
-				command = sc.nextLine();
-				CommandRegex cr = new CommandRegex(command);
-				if(cr.getIsValid()){
-					System.out.println(cr.getUpOrDownLoad());
-					UpOrDown = cr.getUpOrDownLoad();
-					System.out.println(cr.getIpAddress());
-					IP_ADDRESS = cr.getIpAddress();
-					System.out.println(cr.getFilePath());
-					SEND_FILE_PATH = cr.getFilePath();
+//				System.out.println("please input commond");
+//				command = sc.nextLine();
+//				CommandRegex cr = new CommandRegex(command);
+//				if(cr.getIsValid()){
+//					System.out.println(cr.getUpOrDownLoad());
+//					UpOrDown = cr.getUpOrDownLoad();
+//					System.out.println(cr.getIpAddress());
+//					IP_ADDRESS = cr.getIpAddress();
+//					System.out.println(cr.getFilePath());
+//					SEND_FILE_PATH = cr.getFilePath();
 					if(UpOrDown.equals("lsend")){
 						dpk.setData(UDPUtils.download,0,UDPUtils.download.length);
 						dsk.send(dpk);
@@ -60,10 +78,6 @@ public class UDPClient {
 						break;
 					}
 				}
-				else{
-					System.out.println("Wrong Command");
-				}
-			}
         } catch (Exception e) {
             e.printStackTrace();
         }finally{
@@ -130,7 +144,7 @@ public class UDPClient {
 						dsk.receive(dpk);
 						// confirm server receive
 						if(receiveBuf[0]!=1){
-							System.out.println("resend ...");
+							System.out.println("Packet lost! Resend.");
 							System.out.println(packet.getCheckSum());
 							dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 							dsk.send(dpk);
@@ -138,6 +152,7 @@ public class UDPClient {
 						else
 							break;
 					} catch (SocketTimeoutException e) {
+						System.out.println("Time out! Resend the packet.");
 						dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 						dsk.send(dpk);
 						continue;
@@ -192,7 +207,6 @@ public class UDPClient {
 			int readSize = 0;
 			int readCount = 1;
 			int flushSize = 0;
-			int flag = 0;
 
 			while((readSize = dpk.getLength()) != 0){
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,Buf,dpk.getLength())){
@@ -205,9 +219,6 @@ public class UDPClient {
 				ReliablePacket packet = new ReliablePacket(Buf);
 				int t = packet.getSeqNum()&0xff;
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
-					if(readCount==100){
-						continue;
-					}
 					bos.write(packet.getData(), 0, readSize-6);
 					if(++flushSize % 1000 == 0){
 						flushSize = 0;
@@ -238,3 +249,7 @@ public class UDPClient {
 		
 	}
 }
+
+/*
+LFTP lsend 172.18.33.211 2018.flv
+*/

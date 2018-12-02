@@ -20,7 +20,7 @@ public class CommandAnalysis {
     public void CommandSplit(){
         String[] temp = inputString.split("\\s");
         if(temp.length != 4){
-            System.out.println("Length");
+            //System.out.println("Length");
             isCorrect = false;
             return;
         }
@@ -29,7 +29,7 @@ public class CommandAnalysis {
         FilePath = temp[3];
         File file = new File(FilePath);
         if(!file.exists()){
-            System.out.println("File");
+            //System.out.println("File");
             isCorrect = false;
         }
     }

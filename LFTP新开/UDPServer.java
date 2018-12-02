@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 
 public class UDPServer {
 
-	private static final String SAVE_FILE_PATH = "2019.flv";
+	private static final String SAVE_FILE_PATH = "2019.txt";
     private static DatagramPacket dpk = null;
 	public static void main(String[] args) {
 
@@ -50,10 +51,6 @@ public class UDPServer {
 				 System.out.println("Error.");
 				 return;
 			 }
-			 
-			 
-			 
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally{
@@ -81,6 +78,7 @@ public class UDPServer {
 			int readCount = 1;
 			int flushSize = 0;
 
+			int flag = 0;
 			while((readSize = dpk.getLength()) != 0){
 				if(UDPUtils.isEqualsByteArray(UDPUtils.end,buf,dpk.getLength())){
 					byte[] a = new byte[1];
@@ -92,6 +90,10 @@ public class UDPServer {
 				ReliablePacket packet = new ReliablePacket(buf);
 				int t = packet.getSeqNum()&0xff;
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
+					if(flag==0&&readCount==2){
+						flag = 1;
+						continue;
+					}
 					bos.write(packet.getData(), 0, readSize-6);
 					if(++flushSize % 1000 == 0){
 						flushSize = 0;
@@ -207,6 +209,7 @@ public class UDPServer {
 			byte[] tempReceive = new byte[100];
 			inputDPK.setData(tempReceive,0,tempReceive.length);
 			inputDSK.receive(inputDPK);
+			System.out.println("Test address:" + inputDPK.getAddress());
 			if(UDPUtils.isEqualsByteArray(UDPUtils.connectClient, tempReceive, inputDPK.getLength())){
 				System.out.println("Receive first SYN from client");
 				System.out.println("Send second SYN from server");
