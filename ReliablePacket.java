@@ -67,7 +67,7 @@ public class ReliablePacket {
 			length = buf.length-2;
 		}
 		int sum = 0, carry = 0;
-		for (int i = 0;i < length;i+=2){
+		for (int i = 0;i < length-1;i+=2){
 			sum += (buf[i]&0xff)<<8|(buf[i+1]&0xff);
 			carry = sum/65536;
 			sum %= 65536;
@@ -89,7 +89,7 @@ public class ReliablePacket {
 			length = buf.length-2;
 		}
 		int sum = 0, carry = 0;
-		for (int i = 0;i < length;i+=2){
+		for (int i = 0;i < length-1;i+=2){
 			sum += (buf[i]&0xff)<<8|(buf[i+1]&0xff);
 			carry = sum/65536;
 			sum %= 65536;
@@ -110,7 +110,8 @@ public class ReliablePacket {
 		}
 		if(_checksum+computeSum()==65535) return true;
 		else {
-			System.out.println("Packet "+Integer.toString(_seqnum)+" error.");
+			int i = _seqnum&0xff;
+			System.out.println("Packet "+Integer.toString(i)+" error.");
 			return false;
 		}
 	}
