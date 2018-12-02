@@ -91,6 +91,7 @@ public class UDPServer {
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
 					if(flag==0&&readCount==2){
 						flag = 1;
+						dsk.receive(dpk);
 						continue;
 					}
 					bos.write(packet.getData(), 0, readSize-6);

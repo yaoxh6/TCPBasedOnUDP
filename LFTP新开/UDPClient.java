@@ -46,7 +46,7 @@ public class UDPClient {
 		}
 		try {
             dpk = new DatagramPacket(Buf, Buf.length, new InetSocketAddress(InetAddress.getByName(IP_ADDRESS), UDPUtils.PORT + 1));
-            dsk = new DatagramSocket(UDPUtils.PORT);
+            dsk = new DatagramSocket(UDPUtils.PORT+3);
 
 			if(ClientConnect(dsk,dpk)){
 				System.out.println("Connect Success");
@@ -103,6 +103,7 @@ public class UDPClient {
 			inputDSK.receive(inputDPK);
 			if(UDPUtils.isEqualsByteArray(UDPUtils.connectServer, tempReceive, inputDPK.getLength())){
 				System.out.println("Receive second SYN from server");
+				System.out.println("Server Port: "+inputDPK.getPort());
 				return true;
 			}
 			return false;
