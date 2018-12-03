@@ -8,8 +8,6 @@ import java.net.InetSocketAddress;
 
 public class UDPServer {
 
-	private static final String SAVE_FILE_PATH = "2019.txt";
-	private static DatagramPacket dpk = null;
 	private static int NumOfClient = UDPUtils.PORT + 2;
 	public static void main(String[] args) {
 
@@ -18,6 +16,7 @@ public class UDPServer {
 
 
 		DatagramSocket dsk = null;
+		DatagramPacket dpk = null;
 		BufferedOutputStream bos = null;
 		try {
 			dpk = new DatagramPacket(buf, buf.length,new InetSocketAddress(InetAddress.getByName("172.18.33.212"), UDPUtils.PORT));
@@ -48,6 +47,7 @@ public class UDPServer {
 
 	private static boolean ServerConnect(DatagramSocket inputDSK,DatagramPacket inputDPK) {
 		try{
+			DatagramPacket dpk = inputDPK;
 			byte[] tempReceive = new byte[100];
 			inputDPK.setData(tempReceive,0,tempReceive.length);
 			inputDSK.receive(inputDPK);
