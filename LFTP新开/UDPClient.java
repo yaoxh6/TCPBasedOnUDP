@@ -152,7 +152,7 @@ public class UDPClient {
 						dpk.setData(receiveBuf, 0, receiveBuf.length);
 						dsk.receive(dpk);
 						if(receiveBuf[0]!=1){
-							System.out.println("Packet lost! Resend.");
+							System.out.println("Resend the wrong packet.");
 							System.out.println(packet.getCheckSum());
 							dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 							dsk.send(dpk);
@@ -160,7 +160,7 @@ public class UDPClient {
 						else
 							break;
 					} catch (SocketTimeoutException e) {
-						System.out.println("Time out! Resend the packet.");
+						System.out.println("Resend the lost packet.");
 						dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
 						dsk.send(dpk);
 						continue;
@@ -186,11 +186,13 @@ public class UDPClient {
 						break;
 					}
 					else{
+						System.out.println("Resend the wrong packet.");
 						dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
 						dsk.send(dpk);
 						dpk.setData(receiveBuf,0,receiveBuf.length);
 					}
 				} catch (SocketTimeoutException e) {
+					System.out.println("Resend the lost packet.");
 					dpk.setData(UDPUtils.end,0,UDPUtils.end.length);
 					dsk.send(dpk);
 					dpk.setData(receiveBuf,0,receiveBuf.length);
@@ -215,13 +217,11 @@ public class UDPClient {
 			int readSize = 0;
 			int readCount = 1;
 			int flushSize = 0;
-
+			int flag = 0;
 			int first = 0;
 			while((readSize = dpk.getLength()) != 0){
-
 				if (first==0){
 					if(UDPUtils.isEqualsByteArray(UDPUtils.fileNotExist, Buf, dpk.getLength())){
-
 						System.out.println("File is not Exist");
 						break;
 					}
@@ -237,7 +237,13 @@ public class UDPClient {
 				}
 				ReliablePacket packet = new ReliablePacket(Buf);
 				int t = packet.getSeqNum()&0xff;
+
 				if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
+					if(t==2&&flag==0){
+						dsk.receive(dpk);
+						flag = 1;
+						continue;
+					}
 					bos.write(packet.getData(), 0, readSize-6);
 					if(++flushSize % 1000 == 0){
 						flushSize = 0;
