@@ -86,6 +86,11 @@ public class UDPServerThread extends Thread {
                 ReliablePacket packet = new ReliablePacket(buf);
                 int t = packet.getSeqNum()&0xff;
                 if((packet.check()&&t==readCount)||readSize!=UDPUtils.BUFFER_SIZE){
+                    if(t==3&&flag==0){
+                        dsk.receive(dpk);
+                        flag++;
+                        continue;
+                    }
                     bos.write(packet.getData(), 0, readSize-6);
                     if(++flushSize % 1000 == 0){
                         flushSize = 0;
@@ -149,7 +154,7 @@ public class UDPServerThread extends Thread {
                         dsk.receive(dpk);
                         // confirm server receive
                         if(receiveBuf[0]!=1){
-                            System.out.println("Resend ...");
+                            System.out.println("Resend the wrong packet");
                             System.out.println(packet.getCheckSum());
                             dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
                             dsk.send(dpk);
@@ -159,6 +164,7 @@ public class UDPServerThread extends Thread {
                     } catch (SocketTimeoutException e) {
                         dpk.setData(packet.getBuf(), 0, packet.getBuf().length);
                         dsk.send(dpk);
+                        System.out.println("Resend the lost packet");
                         continue;
                     }
 
