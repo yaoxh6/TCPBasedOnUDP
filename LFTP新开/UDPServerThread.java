@@ -5,10 +5,10 @@ import java.util.Arrays;
 public class UDPServerThread extends Thread {
     DatagramSocket dsk;
     byte[] buf = new byte[UDPUtils.BUFFER_SIZE+6];
-    static DatagramPacket dpk = null;
-    private static String SAVE_FILE_PATH = "2019.txt";
-    private static InetAddress IPAddress;
-    private static int IPPort;
+    DatagramPacket dpk = null;
+    private String SAVE_FILE_PATH = "2019.txt";
+    private InetAddress IPAddress;
+    private int IPPort;
     public UDPServerThread(DatagramSocket socket,InetAddress IPAddress,int IPPort) throws IOException {
         this.dsk = socket;
         this.IPAddress = IPAddress;
@@ -55,7 +55,7 @@ public class UDPServerThread extends Thread {
         }
     }
 
-    private static void DownLoad(DatagramSocket dsk){
+    private void DownLoad(DatagramSocket dsk){
         try {
 
             byte[] buf = new byte[UDPUtils.BUFFER_SIZE+6];
@@ -80,6 +80,7 @@ public class UDPServerThread extends Thread {
                     a[0] = 1;
                     dpk.setData(a, 0, 1);
                     dsk.send(dpk);
+                    System.out.println(SAVE_FILE_PATH + " has been received");
                     break;
                 }
                 ReliablePacket packet = new ReliablePacket(buf);
@@ -112,11 +113,12 @@ public class UDPServerThread extends Thread {
 
             }
             bos.flush();
+            bos.close();
         } catch (Exception e) {
             // TODO: handle exception
         }
     }
-    private static void UpLoad(DatagramSocket dsk){
+    private void UpLoad(DatagramSocket dsk){
         try {
             int sendCount = 1;
             int seqnum = 1;
